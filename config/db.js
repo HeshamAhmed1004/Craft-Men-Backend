@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
     try {
-        await mongoose.connect('mongodb://localhost:27017/imageUploadDB', {
+        await mongoose.connect(process.env.MONGODB_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true
         });
@@ -12,5 +12,17 @@ const connectDB = async () => {
         process.exit(1);
     }
 };
+// const connectDB = async () => {
+//     try {
+//         await mongoose.connect('mongodb+srv://admin:<HeshamAhmed2025>@cluster0.gczrfef.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
+//             useNewUrlParser: true,
+//             useUnifiedTopology: true
+//         });
+//         console.log('MongoDB Connected');
+//     } catch (err) {
+//         console.error('MongoDB Connection Error:', err);
+//         process.exit(1);
+//     }
+// };
 
 module.exports = connectDB;
