@@ -138,10 +138,6 @@ const offerSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    timeline: {
-        type: String,
-        required: true
-    },
     message: {
         type: String,
         default: ""

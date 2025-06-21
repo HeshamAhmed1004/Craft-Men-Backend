@@ -154,10 +154,10 @@ exports.register = async (req, res) => {
 //         next(err);
 //     }
 // };
+
 exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-
         // 1. Check if email and password exist
         if (!email || !password) {
             return res.status(400).json({
@@ -165,43 +165,32 @@ exports.login = async (req, res, next) => {
                 error: 'Please provide email and password'
             });
         }
-
         // 2. Check if user exists and password is correct
         const user = await User.findOne({ email }).select('+password');
-
         if (!user) {
             return res.status(401).json({
                 success: false,
                 error: 'Invalid credentials'
             });
         }
-
         // 3. Verify password
         const isMatch = await user.matchPassword(password);
-
         if (!isMatch) {
             return res.status(401).json({
                 success: false,
                 error: 'Invalid credentials'
             });
         }
-
         // 4. If everything ok, send token
         const token = user.getSignedJwtToken();
-
         res.status(200).json({
             success: true,
             token,
             user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                phone: user.phone,
-                accountType: user.accountType,
+                id: user._id, name: user.name, email: user.email, phone: user.phone, accountType: user.accountType,
                 country: user.country
             }
         });
-
     } catch (err) {
         console.error(err);
         res.status(500).json({

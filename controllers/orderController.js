@@ -10,15 +10,7 @@ exports.createOrder = async (req, res) => {
         }
 
         const {
-            userId,
-            country,
-            accountType,
-            formDesc,
-            date,
-            time,
-            address,
-            name,
-            phone
+            userId,country,accountType,formDesc, date,time,address,name,phone
         } = req.body;
 
         const newOrder = new Order({
@@ -74,7 +66,7 @@ exports.getOrderById = async (req, res) => {
     }
 };
 
-
+// Get orders by user ID
 exports.getOrdersByUserId = async (req, res) => {
     try {
         const orders = await Order.find({userId: req.params.userId}).sort({ createdAt: -1 });
@@ -92,7 +84,7 @@ exports.getOrdersByUserId = async (req, res) => {
 //         res.status(500).json({ success: false, message: 'Server error', error: error.message });
 //     }
 // };
-
+// Get orders by account type and country
 exports.getOrdersByAccountTypeAndCountry = async (req, res) => {
     try {
         const { accountType, country } = req.params;
@@ -133,7 +125,7 @@ exports.getOrdersByAccountTypeAndCountry = async (req, res) => {
         });
     }
 };
-
+// Update order status
 exports.updateOrderStatus = async (req, res) => {
     try {
         const { orderStatus, isCraftAccept, isUserAccept } = req.body;
@@ -158,7 +150,7 @@ exports.updateOrderStatus = async (req, res) => {
 // This function allows a craftsman to submit an offer for a specific order.
 exports.submitOffer = async (req, res) => {
     try {
-        const { price, timeline, message, craftsmanId,name,phone } = req.body; // Get craftsmanId from body
+        const { price, message, craftsmanId,name,phone } = req.body; // Get craftsmanId from body
         const orderId = req.params.orderId;
         
         if (!craftsmanId) {
@@ -171,7 +163,7 @@ exports.submitOffer = async (req, res) => {
         const order = await orderService.submitCraftsmanOffer(
             orderId,
             craftsmanId, // Use ID from request body
-            { price, timeline, message,name, phone }
+            { price, message,name, phone }
         );
 
         res.status(201).json({
@@ -216,7 +208,9 @@ exports.submitOffer = async (req, res) => {
 // Get order details with offers
 // This function retrieves the order details along with the offers made by craftsmen.
 
-
+// It uses the orderService to fetch the order and its associated offers.
+// It returns the order data in the response.
+// This function retrieves the order details along with the offers made by craftsmen.
 exports.getOrderDetails = async (req, res, next) => {
     const order = await orderService.getOrderWithOffers(
         req.params.orderId,
@@ -238,24 +232,20 @@ exports.acceptOffer = async (req, res) => {
     try {
         const { orderId } = req.params;
         const { craftsmanOfferId } = req.body;
-
         // 1. Find the order
         const order = await Order.findById(orderId);
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
-
         // 2. Check if the order is already accepted
         if (order.isUserAccept) {
             return res.status(400).json({ success: false, message: 'Order already accepted' });
         }
-
         // 3. Find the selected offer
         const selectedOffer = order.craftsmenOffers.id(craftsmanOfferId);
         if (!selectedOffer) {
             return res.status(404).json({ success: false, message: 'Offer not found' });
         }
-
         // 4. Update the offer and order status
         selectedOffer.accepted = true;
         order.isUserAccept = true;
